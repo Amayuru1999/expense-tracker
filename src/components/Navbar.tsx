@@ -23,6 +23,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const supabase = createClient();
+    if (!supabase) return;
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
@@ -38,7 +40,9 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
     setUser(null);
     router.push('/login');
     router.refresh();

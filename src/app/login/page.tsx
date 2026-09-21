@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Lock, Mail, Loader2, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'error' | 'success' | 'warning'; text: string } | null>(null);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +19,14 @@ export default function LoginPage() {
     setMessage(null);
 
     const supabase = createClient();
+    if (!supabase) {
+      setMessage({
+        type: 'warning',
+        text: 'NEXT_PUBLIC_SUPABASE_ANON_KEY is not configured yet in .env.local. Add your anon key from Supabase Dashboard > Project Settings > API to enable authentication.',
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       if (isSignUp) {
@@ -82,11 +90,14 @@ export default function LoginPage() {
             className={`rounded-xl p-4 text-xs sm:text-sm ${
               message.type === 'error'
                 ? 'border border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300'
+                : message.type === 'warning'
+                ? 'border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300'
                 : 'border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300'
             }`}
           >
-            <div className="flex items-center gap-2">
-              {message.type === 'success' && <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />}
+            <div className="flex items-start gap-2">
+              {message.type === 'success' && <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />}
+              {message.type === 'warning' && <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />}
               <span>{message.text}</span>
             </div>
           </div>
