@@ -89,3 +89,14 @@ NEXT_PUBLIC_SUPABASE_URL=https://ixyagmwtvenklguggose.supabase.co
 npx vercel
 ```
 Follow the interactive prompts and enter the `DATABASE_URL` and `NEXT_PUBLIC_SUPABASE_URL` when requested.
+
+---
+
+## 🔐 Supabase Auth Integration
+
+1. The app includes ready-to-use Supabase Authentication (`/login` and `/auth/callback`).
+2. Add your **Anon Key** from the Supabase Project Dashboard (**Project Settings > API > `anon` public key**) to your `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+   ```
+3. Add the same environment variable in Vercel under **Project Settings > Environment Variables**.
