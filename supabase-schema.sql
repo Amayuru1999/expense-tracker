@@ -1,6 +1,7 @@
 -- Create expenses table
 CREATE TABLE IF NOT EXISTS expenses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   date DATE NOT NULL,
   category TEXT NOT NULL,
   sub_category TEXT,
@@ -13,6 +14,7 @@ CREATE TABLE IF NOT EXISTS expenses (
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date DESC);
 CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category);
+CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses(user_id);
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;

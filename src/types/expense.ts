@@ -1,5 +1,6 @@
 export interface Expense {
   id: string;
+  user_id?: string | null;
   date: string;
   category: string;
   sub_category: string | null;

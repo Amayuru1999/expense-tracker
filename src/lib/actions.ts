@@ -3,6 +3,17 @@
 import { query } from './db';
 import { revalidatePath } from 'next/cache';
 import { Expense } from '@/types/expense';
+import { createServerSupabaseClient } from './supabaseServer';
+
+async function getCurrentUserId(): Promise<string | null> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.user?.id || null;
+  } catch {
+    return null;
+  }
+}
 
 export async function getExpenses(filters?: {
   startDate?: string;
@@ -38,7 +49,7 @@ export async function getExpenses(filters?: {
   const totalCount = parseInt(countRes[0]?.count || '0', 10);
 
   // Data query
-  const limit = filters?.limit || 50;
+  const limit = filters?.limit || 500;
   const offset = filters?.offset || 0;
   params.push(limit);
   const limitIdx = idx++;
@@ -47,7 +58,8 @@ export async function getExpenses(filters?: {
 
   const rawExpenses = await query<any>(
     `SELECT 
-      id, 
+      id,
+      user_id, 
       to_char(date, 'YYYY-MM-DD') as date, 
       category, 
       sub_category, 
@@ -120,7 +132,8 @@ export async function getDashboardStats(): Promise<{
   // Recent 8 expenses
   const recentExpenses = await query<any>(
     `SELECT 
-      id, 
+      id,
+      user_id, 
       to_char(date, 'YYYY-MM-DD') as date, 
       category, 
       sub_category, 
@@ -150,10 +163,19 @@ export async function addExpense(data: {
   amount: number;
   description?: string;
 }) {
+  const userId = await getCurrentUserId();
+  
+  // If not logged in, fallback to the linked default owner amarasingheau@gmail.com
+  const fallbackRes = await query<{ id: string }>(
+    `SELECT id FROM auth.users WHERE email = 'amarasingheau@gmail.com' LIMIT 1`
+  );
+  const targetUserId = userId || fallbackRes[0]?.id || null;
+
   await query(
-    `INSERT INTO expenses (date, category, sub_category, amount, description) 
-     VALUES ($1, $2, $3, $4, $5)`,
+    `INSERT INTO expenses (user_id, date, category, sub_category, amount, description) 
+     VALUES ($1, $2, $3, $4, $5, $6)`,
     [
+      targetUserId,
       data.date,
       data.category,
       data.sub_category || null,
