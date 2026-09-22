@@ -44,6 +44,8 @@ export default async function DashboardPage() {
       <DashboardCharts
         categoryData={stats.categoryData}
         monthlyData={stats.monthlyData}
+        weeklyData={stats.weeklyData}
+        dailyData={stats.dailyData}
       />
 
       {/* Bottom Grid: Form + Recent Expenses */}

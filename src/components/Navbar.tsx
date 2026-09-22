@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   ReceiptText,
+  BarChart3,
   PlusCircle,
   Menu,
   X,
@@ -50,6 +51,7 @@ export default function Navbar() {
 
   const navItems = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Expenses', href: '/expenses', icon: ReceiptText },
   ];
 
